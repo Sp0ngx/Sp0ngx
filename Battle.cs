@@ -1,6 +1,3 @@
-// Name: Nicholas Kow
-// AdminNo: 242682R
-
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
