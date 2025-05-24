@@ -94,7 +94,7 @@ namespace PokemonPocket
         public Charmander(string name, int hp, int exp, int level) : base(name, hp, exp, level)
         {
             name = "Charmander";
-            this.Skill = "Quick Attack";
+            this.Skill = "Solar Power";
             this.SkillDmg = 10;
         }
 
