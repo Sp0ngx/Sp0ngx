@@ -60,7 +60,7 @@ namespace PokemonPocket
                     Console.WriteLine("(5). Heal all pokemon");
                     Console.WriteLine("(6). Delete pokemon");
                     Console.WriteLine("(7). Explore to find pokemons to battle");
-                    Console.Write("Please only enter [1,2,3,4,5,6] or Q to quit: ");
+                    Console.Write("Please only enter [1,2,3,4,5,6,7] or Q to quit: ");
 
                     string input = Console.ReadLine().Trim();
 
@@ -187,12 +187,13 @@ namespace PokemonPocket
                             break;
 
                         case "5": // Heal All Pokemons
-                            foreach (var pokemon in db.Pokemons)
+                            var pokemonsToHeal = db.Pokemons.ToList(); // re-fetch
+                            foreach (var pokemon in pokemonsToHeal)
                             {
                                 pokemon.HP = pokemon.MaxHP;
                             }
-
                             db.SaveChanges();
+
                             Console.WriteLine("All Pokemons have been healed!");
                             break;
 
@@ -236,10 +237,10 @@ namespace PokemonPocket
                             break;
 
                         case "7": // Explore and Battle Pokemons
-                            PokemonBattle pokemonBattle = new PokemonBattle();
+                            PokemonBattle pokemonBattle = new PokemonBattle(db); // To sync DB with Battle.cs
                             if (db.Pokemons.Count() >= 1 && db.Pokemons.Any(p => p.HP > 0)) // Check if player has at least 1 pokemon & if at least 1 is "alive"
                             {
-                                pokemonBattle.Explore();
+                                pokemonBattle.Explore();    
                             }
                             else
                             {
