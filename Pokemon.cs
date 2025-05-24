@@ -3,6 +3,21 @@ using System.Collections.Generic;
 
 namespace PokemonPocket
 {
+
+    public class PokeDex
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Skill { get; set; }
+        public int SkillDmg { get; set; }
+    }
+
+    public class Inventory
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
     public class PokemonMaster
     {
         public string Name { get; set; }
@@ -28,6 +43,7 @@ namespace PokemonPocket
         public string Skill { get; set; }
         public int SkillDmg { get; set; }
         public int Level { get; set; }
+        public int MaxHP { get; set; }
 
         public Pokemon() { }
         public Pokemon(string name, int hp, int exp, int level)
@@ -36,6 +52,7 @@ namespace PokemonPocket
             this.HP = hp;
             this.Exp = exp;
             this.Level = level;
+            this.MaxHP = hp;
         }
 
         public virtual void CalculateDamage(int opponentSkillDmg) { }
@@ -72,12 +89,12 @@ namespace PokemonPocket
             this.HP -= dmgTaken;
         }
     }
-public class Charmander : Pokemon
+    public class Charmander : Pokemon
     {
         public Charmander(string name, int hp, int exp, int level) : base(name, hp, exp, level)
         {
             name = "Charmander";
-            this.Skill = "Solar Power";
+            this.Skill = "Quick Attack";
             this.SkillDmg = 10;
         }
 
