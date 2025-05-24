@@ -12,12 +12,6 @@ namespace PokemonPocket
         public int SkillDmg { get; set; }
     }
 
-    public class Inventory
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
-
     public class PokemonMaster
     {
         public string Name { get; set; }
@@ -62,7 +56,7 @@ namespace PokemonPocket
     {
         public Pikachu(string name, int hp, int exp, int level) : base(name, hp, exp, level)
         {
-            name = "Pikachu";
+            this.Name = "Pikachu";
             this.Skill = "Lightning Bolt";
             this.SkillDmg = 30;
         }
@@ -78,7 +72,7 @@ namespace PokemonPocket
     {
         public Eevee(string name, int hp, int exp, int level) : base(name, hp, exp, level)
         {
-            name = "Eevee";
+            this.Name = "Eevee";
             this.Skill = "Run Away";
             this.SkillDmg = 25;
         }
@@ -93,7 +87,7 @@ namespace PokemonPocket
     {
         public Charmander(string name, int hp, int exp, int level) : base(name, hp, exp, level)
         {
-            name = "Charmander";
+            this.Name = "Charmander";
             this.Skill = "Solar Power";
             this.SkillDmg = 10;
         }
@@ -109,7 +103,7 @@ namespace PokemonPocket
     {
         public Raichu(string name, int hp, int exp, int level) : base(name, hp, exp, level)
         {
-            name = "Raichu";
+            this.Name = "Raichu";
             this.Skill = "Lightning Bolt";
             this.SkillDmg = 30;
         }
@@ -125,7 +119,7 @@ namespace PokemonPocket
     {
         public Flareon(string name, int hp, int exp, int level) : base(name, hp, exp, level)
         {
-            name = "Flareon";
+            this.Name = "Flareon";
             this.Skill = "Run Away";
             this.SkillDmg = 25;
         }
@@ -141,7 +135,7 @@ namespace PokemonPocket
     {
         public Charmeleon(string name, int hp, int exp, int level) : base(name, hp, exp, level)
         {
-            name = "Charmeleon";
+            this.Name = "Charmeleon";
             this.Skill = "Solar Power";
             this.SkillDmg = 10;
         }
