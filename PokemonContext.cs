@@ -1,3 +1,6 @@
+// Name: Nicholas Kow
+// AdminNo: 242682R
+
 using Microsoft.EntityFrameworkCore;
 
 namespace PokemonPocket
