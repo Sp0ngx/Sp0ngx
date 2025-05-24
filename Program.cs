@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading;
 
 namespace PokemonPocket
 {
@@ -12,6 +11,7 @@ namespace PokemonPocket
         {
             using (var db = new PokemonContext())
             {
+                Console.ForegroundColor = ConsoleColor.Gray;
                 db.Database.EnsureCreated();
 
                 // // For testing
@@ -57,15 +57,16 @@ namespace PokemonPocket
                     Console.WriteLine("(2). List pokemon(s) in my Pocket");
                     Console.WriteLine("(3). Check if I can evolve pokemon");
                     Console.WriteLine("(4). Evolve pokemon");
-                    Console.WriteLine("(5). Delete pokemon");
-                    Console.WriteLine("(6). Explore to find pokemons to battle");
-                    Console.Write("Please only enter [1,2,3,4,5] or Q to quit: ");
+                    Console.WriteLine("(5). Heal all pokemon");
+                    Console.WriteLine("(6). Delete pokemon");
+                    Console.WriteLine("(7). Explore to find pokemons to battle");
+                    Console.Write("Please only enter [1,2,3,4,5,6] or Q to quit: ");
 
                     string input = Console.ReadLine().Trim();
 
                     switch (input)
                     {
-                        case "1":
+                        case "1": // Add Pokemon
                             Console.Write("Enter Pokemon's Name: ");
                             string name = Console.ReadLine().Trim();
                             string titleName = char.ToUpper(name[0]) + name.Substring(1).ToLower();
@@ -77,7 +78,7 @@ namespace PokemonPocket
                                 int hp, exp, level;
 
                                 Console.Write("Enter Pokemon's HP: ");
-                                if (!int.TryParse(Console.ReadLine(), out hp) || hp < 0 || hp > 100)
+                                if (!int.TryParse(Console.ReadLine(), out hp) || hp < 0)
                                 {
                                     Console.WriteLine("Invalid HP. Try again.");
                                     break;
@@ -108,7 +109,7 @@ namespace PokemonPocket
 
                             break;
 
-                        case "2":
+                        case "2": // List All Pokemons
                             List<Pokemon> pocket = db.Pokemons.OrderByDescending(p => p.Exp).ToList();
                             foreach (var pokemon in pocket)
                             {
@@ -117,7 +118,7 @@ namespace PokemonPocket
                             }
                             break;
 
-                        case "3":
+                        case "3": // Check if any Pokemon meets evolution requirement
                             var pokemons = db.Pokemons.ToList();
 
                             List<string> evolvableTypes = pokemonMasters.Where(m => pokemons.Count(p => p.Name == m.Name) >= m.NoToEvolve).Select(m => m.Name).Distinct().ToList();
@@ -146,61 +147,56 @@ namespace PokemonPocket
                             }
                             break;
 
-                        case "4":
-                            List<Pokemon> allPokemons = db.Pokemons.ToList();
-
+                        case "4": // Evolve All Pokemons
                             foreach (var master in pokemonMasters)
                             {
-                                int evoAmount = allPokemons.Count(p => p.Name == master.Name) / master.NoToEvolve;
+                                int evoAmount = db.Pokemons.Count(p => p.Name == master.Name) / master.NoToEvolve;
 
                                 if (evoAmount == 0) continue;
 
                                 for (int i = 0; i < evoAmount; i++)
                                 {
-                                    List<Pokemon> pokemonsToRemove = allPokemons.Where(p => p.Name == master.Name).Take(master.NoToEvolve).ToList();
+                                    List<Pokemon> pokemonsToRemove = db.Pokemons.Where(p => p.Name == master.Name).Take(master.NoToEvolve).ToList();
 
-                                    int level = (int)pokemonsToRemove.Max(p => p.Level);
+                                    int level = pokemonsToRemove.Max(p => p.Level);
 
                                     foreach (var p in pokemonsToRemove)
                                     {
                                         db.Pokemons.Remove(p);
                                     }
-                                    // Fix error!!! (Pokemon not recognised)
 
                                     Type typeEvo = Type.GetType($"PokemonPocket.{master.EvolveTo}");
-                                    Pokemon pokemon = (Pokemon)Activator.CreateInstance(typeEvo, 100, 0, level);
-                                    db.Pokemons.Add(pokemon);
+
+                                    try
+                                    {
+                                        if (typeEvo != null && typeof(Pokemon).IsAssignableFrom(typeEvo))
+                                        {
+                                            Pokemon pokemon = (Pokemon)Activator.CreateInstance(typeEvo, master.EvolveTo, 100, 0, level);
+                                            db.Pokemons.Add(pokemon);
+                                            Console.WriteLine($"{master.NoToEvolve} {master.Name} evolved into 1 {master.EvolveTo}!");
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        Console.WriteLine("An error has occurred.");
+                                    }
                                     db.SaveChanges();
 
-                                    // switch (master.EvolveTo.ToLower())
-                                    // {
-                                    //     case "raichu":
-                                    //         db.Pokemons.Add(new Raichu("Raichu", 100, 0, level));
-                                    //         break;
-                                    //     case "flareon":
-                                    //         db.Pokemons.Add(new Flareon("Flareon", 100, 0, level));
-                                    //         break;
-                                    //     case "charmeleon":
-                                    //         db.Pokemons.Add(new Charmeleon("Charmeleon", 100, 0, level));
-                                    //         break;
-                                    //     default:
-                                    //         Console.WriteLine("No evolution for " + master.Name);
-                                    //         break;
-                                    // }
-
-
-                                    // db.SaveChanges();
-                                    // Console.WriteLine($"{master.NoToEvolve} {master.Name} evolved into 1 {master.EvolveTo}!");
-
                                 }
-
-
-
-
                             }
                             break;
 
-                        case "5":
+                        case "5": // Heal All Pokemons
+                            foreach (var pokemon in db.Pokemons)
+                            {
+                                pokemon.HP = pokemon.MaxHP;
+                            }
+
+                            db.SaveChanges();
+                            Console.WriteLine("All Pokemons have been healed!");
+                            break;
+
+                        case "6": // Delete Pokemon
                             if (db.Pokemons.Count() == 0)
                             {
                                 Console.WriteLine("Your pocket is empty.");
@@ -239,10 +235,19 @@ namespace PokemonPocket
 
                             break;
 
-                        case "6":
+                        case "7": // Explore and Battle Pokemons
                             PokemonBattle pokemonBattle = new PokemonBattle();
-                            pokemonBattle.Explore();
+                            if (db.Pokemons.Count() >= 1 && db.Pokemons.Any(p => p.HP > 0)) // Check if player has at least 1 pokemon & if at least 1 is "alive"
+                            {
+                                pokemonBattle.Explore();
+                            }
+                            else
+                            {
+                                Console.WriteLine("You need at least 1 pokemon to battle and it needs to have at least 1 hp.");
+                            }
                             break;
+
+
 
                         case "q":
                         case "Q":
